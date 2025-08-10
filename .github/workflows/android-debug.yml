@@ -5,6 +5,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      ANDROID_SDK_ROOT: /usr/local/android-sdk
+
     steps:
       - uses: actions/checkout@v4
 
@@ -13,17 +16,21 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - uses: android-actions/setup-android@v3
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Install Android build tools and platform
+      - name: Install build tools & platform
         run: |
           sdkmanager --install "platform-tools" "build-tools;34.0.0" "platforms;android-34"
           yes | sdkmanager --licenses
 
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: 8.7
+      # === BYPASS CACHE: download Gradle directly, no gradle/actions ===
+      - name: Download Gradle 8.7
+        run: |
+          set -e
+          curl -sSLo gradle.zip https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          unzip -q gradle.zip
+          echo "$PWD/gradle-8.7/bin" >> $GITHUB_PATH
 
       - name: Build debug APK
         run: gradle --no-daemon assembleDebug --stacktrace
