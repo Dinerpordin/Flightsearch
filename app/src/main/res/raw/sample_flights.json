@@ -1,0 +1,92 @@
+{
+  "currency": "GBP",
+  "data": [
+    {
+      "price": 725.0,
+      "duration": {
+        "total": 43200
+      },
+      "deep_link": "https://example.com/booking/1",
+      "route": [
+        {
+          "airline": "EK",
+          "flight_no": 2,
+          "cityFrom": "London",
+          "cityTo": "Dubai",
+          "flyFrom": "LHR",
+          "flyTo": "DXB",
+          "local_departure": "2025-12-18T09:30",
+          "local_arrival": "2025-12-18T20:00"
+        },
+        {
+          "airline": "EK",
+          "flight_no": 582,
+          "cityFrom": "Dubai",
+          "cityTo": "Dhaka",
+          "flyFrom": "DXB",
+          "flyTo": "DAC",
+          "local_departure": "2025-12-18T22:00",
+          "local_arrival": "2025-12-19T04:00"
+        }
+      ]
+    },
+    {
+      "price": 680.0,
+      "duration": {
+        "total": 50400
+      },
+      "deep_link": "https://example.com/booking/2",
+      "route": [
+        {
+          "airline": "TK",
+          "flight_no": 1980,
+          "cityFrom": "London",
+          "cityTo": "Istanbul",
+          "flyFrom": "LHR",
+          "flyTo": "IST",
+          "local_departure": "2025-12-18T07:45",
+          "local_arrival": "2025-12-18T13:15"
+        },
+        {
+          "airline": "TK",
+          "flight_no": 712,
+          "cityFrom": "Istanbul",
+          "cityTo": "Dhaka",
+          "flyFrom": "IST",
+          "flyTo": "DAC",
+          "local_departure": "2025-12-18T21:00",
+          "local_arrival": "2025-12-19T05:30"
+        }
+      ]
+    },
+    {
+      "price": 540.0,
+      "duration": {
+        "total": 57600
+      },
+      "deep_link": "https://example.com/booking/3",
+      "route": [
+        {
+          "airline": "GF",
+          "flight_no": 2,
+          "cityFrom": "London",
+          "cityTo": "Bahrain",
+          "flyFrom": "LHR",
+          "flyTo": "BAH",
+          "local_departure": "2025-12-18T10:20",
+          "local_arrival": "2025-12-18T18:15"
+        },
+        {
+          "airline": "GF",
+          "flight_no": 250,
+          "cityFrom": "Bahrain",
+          "cityTo": "Dhaka",
+          "flyFrom": "BAH",
+          "flyTo": "DAC",
+          "local_departure": "2025-12-18T23:10",
+          "local_arrival": "2025-12-19T06:10"
+        }
+      ]
+    }
+  ]
+}
