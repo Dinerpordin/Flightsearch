@@ -1,0 +1,6 @@
+RELEASE_STORE_FILE=keystore/flightsearch-release.jks
+RELEASE_STORE_PASSWORD=change_me_password
+RELEASE_KEY_ALIAS=flightsearch_release
+RELEASE_KEY_PASSWORD=change_me_password
+APP_VERSION_CODE=1
+APP_VERSION_NAME=1.0.0
