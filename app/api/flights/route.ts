@@ -1,11 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// Mock flight data generator
+function generateMockFlights(from: string, to: string, departDate: string, returnDate: string | null, passengers: number, currency: string) {
+  const airlines = ['BA', 'LH', 'AF', 'KL', 'EK', 'QR', 'TK', 'SQ', 'AA', 'DL'];
+  const flights = [];
+  
+  for (let i = 0; i < 10; i++) {
+    const basePrice = 200 + Math.random() * 800;
+    const stops = Math.floor(Math.random() * 3);
+    
+    // Outbound flight
+    flights.push({
+      id: `OUT-${i + 1}`,
+      airline: airlines[Math.floor(Math.random() * airlines.length)],
+      from: from.toUpperCase(),
+      to: to.toUpperCase(),
+      date: departDate,
+      price: parseFloat((basePrice * passengers).toFixed(2)),
+      currency: currency,
+      duration: `${5 + Math.floor(Math.random() * 10)}h ${Math.floor(Math.random() * 60)}m`,
+      stops: stops,
+      departureTime: `${String(6 + i).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+      arrivalTime: `${String(12 + i).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+      bookingUrl: `https://www.google.com/travel/flights?q=flights+from+${from}+to+${to}+on+${departDate}`,
+    });
+    
+    // Return flight if round-trip
+    if (returnDate) {
+      flights.push({
+        id: `RET-${i + 1}`,
+        airline: airlines[Math.floor(Math.random() * airlines.length)],
+        from: to.toUpperCase(),
+        to: from.toUpperCase(),
+        date: returnDate,
+        price: parseFloat((basePrice * passengers * 0.9).toFixed(2)),
+        currency: currency,
+        duration: `${5 + Math.floor(Math.random() * 10)}h ${Math.floor(Math.random() * 60)}m`,
+        stops: stops,
+        departureTime: `${String(14 + i).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+        arrivalTime: `${String(20 + i).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+        bookingUrl: `https://www.google.com/travel/flights?q=flights+from+${to}+to+${from}+on+${returnDate}`,
+      });
+    }
+  }
+  
+  return flights.sort((a, b) => a.price - b.price);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { from, to, departDate, returnDate, passengers, cabinClass, tripType } = body;
+    const { from, to, departDate, returnDate, passengers, cabinClass, tripType, currency } = body;
 
-    // Validate required fields
     if (!from || !to || !departDate) {
       return NextResponse.json(
         { error: 'Missing required fields: from, to, departDate' },
@@ -13,102 +59,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get Amadeus access token
-    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        grant_type: 'client_credentials',
-        client_id: process.env.AMADEUS_API_KEY || '',
-        client_secret: process.env.AMADEUS_API_SECRET || '',
-      }),
-    });
-
-    if (!tokenResponse.ok) {
-      console.error('Failed to get Amadeus token');
-      return NextResponse.json(
-        { error: 'Failed to authenticate with flight API' },
-        { status: 500 }
-      );
-    }
-
-    const { access_token } = await tokenResponse.json();
-
-    // Search for flights
-    const searchParams = new URLSearchParams({
-      originLocationCode: from.toUpperCase(),
-      destinationLocationCode: to.toUpperCase(),
-      departureDate: departDate,
-      adults: passengers?.toString() || '1',
-      travelClass: cabinClass?.toUpperCase() || 'ECONOMY',
-      nonStop: 'false',
-      max: '10',
-    });
-
-    if (returnDate && tripType === 'return') {
-      searchParams.append('returnDate', returnDate);
-    }
-
-    const flightResponse = await fetch(
-      `https://test.api.amadeus.com/v2/shopping/flight-offers?${searchParams}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${access_token}`,
-        },
-      }
+    // Generate mock flights
+    const flights = generateMockFlights(
+      from,
+      to,
+      departDate,
+      tripType === 'return' ? returnDate : null,
+      passengers || 1,
+      currency || 'USD'
     );
-
-    if (!flightResponse.ok) {
-      const errorData = await flightResponse.json();
-      console.error('Flight API error:', errorData);
-      return NextResponse.json(
-        { error: 'Failed to fetch flights', details: errorData },
-        { status: flightResponse.status }
-      );
-    }
-
-    const flightData = await flightResponse.json();
-
-    // Transform Amadeus data to our format
-    const transformedFlights = flightData.data?.slice(0, 10).map((offer: any, index: number) => {
-      const firstSegment = offer.itineraries[0].segments[0];
-      const lastSegment = offer.itineraries[0].segments[offer.itineraries[0].segments.length - 1];
-      const duration = offer.itineraries[0].duration.replace('PT', '').toLowerCase();
-      
-      return {
-        id: index + 1,
-        airline: firstSegment.carrierCode,
-        from: firstSegment.departure.iataCode,
-        to: lastSegment.arrival.iataCode,
-        date: departDate,
-        price: parseFloat(offer.price.total),
-        currency: offer.price.currency,
-        duration: duration,
-        stops: offer.itineraries[0].segments.length - 1,
-        departureTime: new Date(firstSegment.departure.at).toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false
-        }),
-        arrivalTime: new Date(lastSegment.arrival.at).toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false
-        }),
-        bookingUrl: `https://www.google.com/travel/flights?q=flights+from+${from}+to+${to}+on+${departDate}`,
-        segments: offer.itineraries[0].segments.length,
-        validatingAirlineCodes: offer.validatingAirlineCodes,
-      };
-    }) || [];
 
     return NextResponse.json({
       success: true,
-      flights: transformedFlights,
+      flights,
       meta: {
-        count: transformedFlights.length,
-        currency: flightData.data?.[0]?.price?.currency || 'USD',
+        count: flights.length,
+        currency: currency || 'USD',
+        tripType,
       },
     });
 
