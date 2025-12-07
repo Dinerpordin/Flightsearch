@@ -305,6 +305,7 @@ console.log('DEBUG: tripType =', tripType, 'returnDate =', returnDate);
         apiUsed,
       },
     });
+        }
 
   } catch (error) {
     console.error('API Error:', error);
