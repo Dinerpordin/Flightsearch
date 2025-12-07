@@ -258,13 +258,24 @@ export async function POST(request: NextRequest) {
     let apiUsed = 'none';
 
     // Try Travelpayouts first (best for pricing)
-    flights = await fetchTravelpayoutsFlights(from, to, departDate, returnDate || null, passengers || 1, currency || 'USD');
+// OLD CODE:     flights = await fetchTravelpayoutsFlights(from, to, departDate, returnDate || null, passengers || 1, currency || 'USD');
+        }
     if (flights && flights.length > 0) {
       apiUsed = 'Travelpayouts';
       console.log('Using Travelpayouts API');
     }
 
-    // Fallback to Aviationstack
+    // Make separate calls for return trips
+    if (returnDate) {
+      const outboundFlights = await fetchTravelpayoutsFlights(from, to, departDate, null, passengers || 1, currency || 'USD');
+      const returnFlights = await fetchTravelpayoutsFlights(to, from, returnDate, null, passengers || 1, currency || 'USD');
+      if (outboundFlights && outboundFlights.length > 0 && returnFlights && returnFlights.length > 0) {
+        flights = [...outboundFlights, ...returnFlights];
+      } else if (outboundFlights && outboundFlights.length > 0) {
+        flights = outboundFlights;
+      }
+    } else {
+      // Fallback to Aviationstack
     if (!flights || flights.length === 0) {
       flights = await fetchAviationstackFlights(from, to, departDate, passengers || 1, currency || 'USD');
       if (flights && flights.length > 0) {
