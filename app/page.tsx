@@ -296,7 +296,7 @@ export default function Home() {
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                     <div>
                       <p className="text-2xl font-bold text-blue-600">{flight.airline}</p>
-                      <p className="text-sm text-gray-500">Flight {flight.id}</p>
+                      <p className="text-sm text-gray-500">Flight {flight.id}Flight {flight.id} - {new Date(flight.date).toLocaleDateString()}</p>
                     </div>
 
                     <div className="text-center">
