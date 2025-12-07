@@ -271,23 +271,42 @@ export async function POST(request: NextRequest) {
       }
     } 
       // Fallback to Aviationstack
-    if (!flights || flights.length === 0) {
-      flights = await fetchAviationstackFlights(from, to, departDate, passengers || 1, currency || 'USD');
-      if (flights && flights.length > 0) {
+      // Fallback to Aviationstack
+  if (!flights || flights.length === 0) {
+    const outboundFlights = await fetchAviationstackFlights(from, to, departDate, passengers || 1, currency || 'USD');
+    if (returnDate) {
+      const returnFlights = await fetchAviationstackFlights(to, from, returnDate, passengers || 1, currency || 'USD');
+      if (outboundFlights && outboundFlights.length > 0 && returnFlights && returnFlights.length > 0) {
+        flights = [...outboundFlights, ...returnFlights];
         apiUsed = 'Aviationstack';
-        console.log('Using Aviationstack API');
+      } else if (outboundFlights && outboundFlights.length > 0) {
+        flights = outboundFlights;
+        apiUsed = 'Aviationstack';
       }
+    } else if (outboundFlights && outboundFlights.length > 0) {
+      flights = outboundFlights;
+      apiUsed = 'Aviationstack';
+      console.log('Using Aviationstack API');
     }
-
-    // Fallback to AeroDataBox
-    if (!flights || flights.length === 0) {
-      flights = await fetchAeroDataBoxFlights(from, to, departDate, passengers || 1, currency || 'USD');
-      if (flights && flights.length > 0) {
+  }
+      // Fallback to AeroDataBox
+  if (!flights || flights.length === 0) {
+    const outboundFlights = await fetchAeroDataBoxFlights(from, to, departDate, passengers || 1, currency || 'USD');
+    if (returnDate) {
+      const returnFlights = await fetchAeroDataBoxFlights(to, from, returnDate, passengers || 1, currency || 'USD');
+      if (outboundFlights && outboundFlights.length > 0 && returnFlights && returnFlights.length > 0) {
+        flights = [...outboundFlights, ...returnFlights];
         apiUsed = 'AeroDataBox';
-        console.log('Using AeroDataBox API');
+      } else if (outboundFlights && outboundFlights.length > 0) {
+        flights = outboundFlights;
+        apiUsed = 'AeroDataBox';
       }
+    } else if (outboundFlights && outboundFlights.length > 0) {
+      flights = outboundFlights;
+      apiUsed = 'AeroDataBox';
+      console.log('Using AeroDataBox API');
     }
-
+  }
     // Final fallback to mock data
     if (!flights || flights.length === 0) {
       flights = generateMockFlights(from, to, departDate, returnDate || null, passengers || 1, currency || 'USD');
