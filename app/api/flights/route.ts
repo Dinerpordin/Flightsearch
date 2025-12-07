@@ -295,7 +295,8 @@ export async function POST(request: NextRequest) {
       console.log('Using Mock Data - Real APIs not available');
 console.log('DEBUG: tripType =', tripType, 'returnDate =', returnDate);
     
-    return NextResponse.json({
+        }
+        return NextResponse.json({
       success: true,
       flights,
       meta: {
@@ -305,7 +306,7 @@ console.log('DEBUG: tripType =', tripType, 'returnDate =', returnDate);
         apiUsed,
       },
     });
-        }
+
 
   } catch (error) {
     console.error('API Error:', error);
