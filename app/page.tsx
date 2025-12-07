@@ -38,6 +38,7 @@ const CURRENCIES = [
   { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
   { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
   { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
+    { code: 'BDT', symbol: '৳', name: 'Bangladeshi Taka' },
 ];
 
 export default function Home() {
