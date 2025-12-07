@@ -258,7 +258,7 @@ export async function POST(request: NextRequest) {
     let apiUsed = 'none';
 
     // Try Travelpayouts first (best for pricing)
-    flights = await fetchTravelpayoutsFlights(from, to, departDate, tripType === 'return' ? returnDate : null, passengers || 1, currency || 'USD');
+    flights = await fetchTravelpayoutsFlights(from, to, departDate, returnDate || null, passengers || 1, currency || 'USD');
     if (flights && flights.length > 0) {
       apiUsed = 'Travelpayouts';
       console.log('Using Travelpayouts API');
@@ -284,11 +284,12 @@ export async function POST(request: NextRequest) {
 
     // Final fallback to mock data
     if (!flights || flights.length === 0) {
-      flights = generateMockFlights(from, to, departDate, tripType === 'return' ? returnDate : null, passengers || 1, currency || 'USD');
+      flights = generateMockFlights(from, to, departDate, returnDate || null, passengers || 1, currency || 'USD');
       apiUsed = 'Mock Data (Demo Mode)';
       console.log('Using Mock Data - Real APIs not available');
     }
-
+console.log('DEBUG: tripType =', tripType, 'returnDate =', returnDate);
+    
     return NextResponse.json({
       success: true,
       flights,
