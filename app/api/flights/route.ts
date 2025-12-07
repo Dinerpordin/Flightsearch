@@ -258,13 +258,7 @@ export async function POST(request: NextRequest) {
     let apiUsed = 'none';
 
     // Try Travelpayouts first (best for pricing)
-// OLD CODE:     flights = await fetchTravelpayoutsFlights(from, to, departDate, returnDate || null, passengers || 1, currency || 'USD');
-        }
-    if (flights && flights.length > 0) {
-      apiUsed = 'Travelpayouts';
-      console.log('Using Travelpayouts API');
-    }
-
+    
     // Make separate calls for return trips
     if (returnDate) {
       const outboundFlights = await fetchTravelpayoutsFlights(from, to, departDate, null, passengers || 1, currency || 'USD');
