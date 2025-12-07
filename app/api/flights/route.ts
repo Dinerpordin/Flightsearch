@@ -265,10 +265,11 @@ export async function POST(request: NextRequest) {
       const returnFlights = await fetchTravelpayoutsFlights(to, from, returnDate, null, passengers || 1, currency || 'USD');
       if (outboundFlights && outboundFlights.length > 0 && returnFlights && returnFlights.length > 0) {
         flights = [...outboundFlights, ...returnFlights];
+                apiUsed = 'Travelpayouts';
       } else if (outboundFlights && outboundFlights.length > 0) {
         flights = outboundFlights;
       }
-    } else {
+    } 
       // Fallback to Aviationstack
     if (!flights || flights.length === 0) {
       flights = await fetchAviationstackFlights(from, to, departDate, passengers || 1, currency || 'USD');
@@ -292,7 +293,6 @@ export async function POST(request: NextRequest) {
       flights = generateMockFlights(from, to, departDate, returnDate || null, passengers || 1, currency || 'USD');
       apiUsed = 'Mock Data (Demo Mode)';
       console.log('Using Mock Data - Real APIs not available');
-    }
 console.log('DEBUG: tripType =', tripType, 'returnDate =', returnDate);
     
     return NextResponse.json({
